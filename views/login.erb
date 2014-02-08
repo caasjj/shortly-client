@@ -1,0 +1,30 @@
+<html>
+<head>
+  <title>Shortly Login</title>
+  <script src="lib/angular.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <form method="Post" action="/login">
+    <label for="username">Username
+      <input name="username" id="username">
+    </label>
+    <label for="password">Password
+      <input name="password" id="password">
+    </label>
+    <button type="submit">Login</button>
+  </form>
+  <form method="Post" action="/user">
+    <label for="username">Username
+      <input name="username" id="username">
+    </label>
+    <label for="password">Password
+      <input name="password" id="password">
+    </label>
+    <label for="password">Confirm Password
+      <input name="password_confirm" id="password">
+    </label>
+    <button type="submit">Create Account</button>
+  </form>
+</body>
+</html>

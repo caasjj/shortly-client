@@ -1,0 +1,76 @@
+<html ng-app="shortlyClient">
+
+<head>
+  <title>Shortly Client with AngularJS</title>
+  <script src="lib/angular.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <h1>Shortly Client with AngularJS</h1>
+
+  <div class="navigation">
+    <ul>
+      <li><a href="#" class="index">All Links</a></li>
+      <li><a href="#" class="create">Shorten</a></li>
+    </ul>
+  </div>
+
+  <div id="container">
+    <button id="logoutButton">Logout</button>
+    <div>
+      <label for="filter">Filter
+        <input name="filter" id="filter">
+      </label>
+      <button id="filterButton">Submit</button>
+    </div>
+    <div ng-controller="listController">
+      <ul>
+        <li class="link" ng-repeat="link in links">
+          <img src="/redirect_icon.png"/>
+          <div class="info">
+            <div class="visits">
+              Last Visited:<span class="lastVisited">{{ link.updated_at }}</span>
+              <span class="count">{{ link.visits }} </span>Visits
+            </div>
+            <div class="title">{{ link.title }}
+            </div>
+            <div class="original">{{ link.url }}
+            </div>
+            <a href="{{link.base_url}}/{{link.code}}">{{ link.base_url }}/{{ link.code }}</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+  var shortlyClient = angular.module('shortlyClient', []);
+  </script>
+
+  <script>
+    shortlyClient.controller('listController', function($scope) {
+      $scope.links =
+      [
+        {
+          updated_at: 'Fri Feb 7, 2014 - 9:32PM',
+          visits: 5,
+          url: "http://www.cnn.com",
+          base_url: "http://localhost:3002",
+          code: "81b47",
+          title: "CNN.com - Breaking News, U.S., World, Weather, Entertainment & Video News",
+        },
+        {
+          updated_at: 'Fri Feb 7, 2014 - 9:32PM',
+          visits: 5,
+          url: "http://www.cnn.com",
+          base_url: "http://localhost:3002",
+          code: "81b47",
+          title: "CNN.com - Breaking News, U.S., World, Weather, Entertainment & Video News",
+        },
+      ]
+    });
+  </script>
+
+</body>
+</html>

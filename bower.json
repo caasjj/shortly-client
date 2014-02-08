@@ -1,0 +1,14 @@
+{
+  "name": "shortly-client",
+  "version": "0.0.0",
+  "dependencies": {
+    "angular": "*"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
