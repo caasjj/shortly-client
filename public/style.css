@@ -63,6 +63,10 @@ button:hover {
   margin-top: 10px;
 }
 
+li.link {
+  list-style: none;
+}
+
 .link {
   clear: both;
   margin-bottom: 5px;
@@ -83,7 +87,7 @@ button:hover {
   float: right;
   margin-right: 10px;
   margin-left: 20px;
-}
+  text-align: left;}
 
 .link .visits .lastVisited {
   margin-right: 30px;
@@ -92,6 +96,9 @@ button:hover {
 .link .visits .count {
   font-size: 46px;
   font-weight: 600;
+  width: 50px;
+  margin-right: 10px;
+  display: inline-block;
 }
 
 .link .title {

@@ -12,7 +12,6 @@
 
   <!-- top navigation bar -->
   <div class="navigation" ng-controller="navController" ng-include="template.url">
-  <!-- <div class="navigation" ng-include="partials/navigation.html"> -->
   </div>
 
   <!-- placeholder for views -->
@@ -26,7 +25,8 @@
 
   <!-- Setup router -->
   <script>
-  shortlyClient.config( function($routeProvider, $locationProvider) {
+  shortlyClient.config( 
+    function($routeProvider, $locationProvider) {
     $locationProvider.html5Mode(true);
     $routeProvider
       .when('/', {
@@ -50,30 +50,60 @@
   <!-- Setup Controllers -->
       <!-- Navigation View Controller -->
   <script>
-  shortlyClient.controller('navController', function($scope) {
-    $scope.template = { name: 'navigation.html', url: 'partials/navigation.html'}
+  shortlyClient.controller(
+    'navController', 
+    function($scope) {
+      $scope.template = { 
+        name: 'navigation.html', 
+        url: 'partials/navigation.html'
+      }
   });
 
-  shortlyClient.controller('shortUrlController', function($scope, $routeParams, $window) {
-    $window.location.href = $routeParams.short;
+  shortlyClient.controller(
+    'shortUrlController', 
+    function($scope, $routeParams, $window) {
+      $window.location.href = $routeParams.short;
   })
   </script>
 
       <!-- Create View Controller -->
   <script>
-  shortlyClient.controller('createViewController', function($scope) {
+  shortlyClient.controller(
+    'createViewController', 
+    function($scope, dataApi) {
+      $scope.postUrl = function() {
+        dataApi
+        .postLink($scope.shorten)
+        .then(function(data) {
+          $scope.postResp = data.data;
+        })
+    };
   });
   </script>
 
       <!-- List View Controller -->
   <script>
-  shortlyClient.controller('listController', function($scope, dataApi) {
-     $scope.order = 'visits';
-     $scope.reverse = true;
-     dataApi.get().then( function(data) {
-        $scope.links = data.data;
-
-     });
+  shortlyClient.controller(
+    'listController', 
+    function($scope, dataApi) {
+      $scope.order = 'visits';
+      $scope.reverse = false;
+      dataApi.getLinks().then( 
+        function(data) {
+          $scope.links = data.data;
+      });
+      $scope.reverseSort = function() {
+        if ($scope.order === 'updated_at')
+          $scope.reverse = !$scope.reverse;
+        else
+          $scope.order = 'updated_at';
+      };
+      $scope.changeSort = function() {
+        if ($scope.order === 'visits')
+          $scope.reverse = !$scope.reverse;
+        else 
+          $scope.order = 'visits';
+      };
   });
   </script>
 
@@ -91,20 +121,29 @@
       getLinks: function() {
         deferred = $http.get('/links');
         deferred
-        .success( function(data) {
-                  data.data.links.forEach( function(link) {
-           var d = new Date( link.updated_at );
-           link.updated_at = d.toLocaleDateString() + '-' + d.toLocalTimeString();
-        });
-              links = data;
+        .success( 
+          function(data) {
+            data.forEach( 
+              function(link) {
+                var d = new Date( link.updated_at );
+                link.updated_at = d.toDateString() + ' - ' + d.toLocaleTimeString();
+                var d = new Date( link.created_at );
+                link.created_at = d.toDateString() + ' - ' + d.toLocaleTimeString();
+              });
+          links = data;
         })
-        .catch( function(error) {
+        .error( function(error) {
           console.log('dataApi.getLinks return error ', error);
         });
         return deferred; 
       },
-      postLinks: function() {
-          // POST messages
+      postLink: function(link) {
+        deferred = $http({
+          method: 'POST', 
+            url: '/links',
+            data: {url : link }
+        });
+        return deferred;
       }
     }
   });

@@ -1,9 +1,17 @@
 <div ng-controller="createViewController" class="creator">
-  <form>
-    <input class="text" type="text" name="url">
+  <form ng-submit="postUrl()">
+    <input class="text" type="text" name="url" ng-model="shorten">
     <button type="submit">Shorten</button>
   </form>
   <img class="spinner" src="/spiffygif_46x46.gif">
   <div class="message">
   </div>
+        <div class="info link" style="display:none">
+      	<img src="/redirect_icon.png"/>
+        <div class="title">{{ postResp.title }}
+        </div>
+        <div class="original">{{ postResp.url }}
+        </div>
+        <a href="{{ postResp.base_url }}/{{ postResp.code }}" >{{ postResp.base_url }}/{{ postResp.code }}</a>
+      </div>
 </div>

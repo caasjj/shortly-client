@@ -1,16 +1,16 @@
 <div ng-controller="listController">
   <div class="filter">
-      <input name="filter" type="text" placeholder="filter links ...">
+      <input name="filter" type="text" placeholder="filter links ..." ng-model="filterText">
       <button id="filterButton">Submit</button>
   </div>
   <ul>
-    <li class="link" ng-repeat="link in links | orderBy:order:reverse">
+    <li class="link" ng-repeat="link in links | filter:filterText | orderBy:order:reverse">
       <img src="/redirect_icon.png"/>
-      <div class="info">
+      <div class="info links">
         <div class="visits">
-          Last Visited:
-          <span class="lastVisited">{{ link.updated_at }}</span>
-          <span class="count">{{ link.visits }} </span>Visits
+          <span class="lastVisited">Last Visited:</span>
+          <span class="lastVisited" ng-click="reverseSort()">{{ link.updated_at }}</span>
+          <span class="count" ng-click="changeSort()">{{ link.visits }}</span>Visits
         </div>
         <div class="title">{{ link.title }}
         </div>
