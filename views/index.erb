@@ -3,73 +3,111 @@
 <head>
   <title>Shortly Client with AngularJS</title>
   <script src="lib/angular.js"></script>
+  <script src="lib/angular-route.js"></script>
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
   <h1>Shortly Client with AngularJS</h1>
 
-  <div class="navigation">
-    <ul>
-      <li><a href="#" class="index">All Links</a></li>
-      <li><a href="#" class="create">Shorten</a></li>
-    </ul>
+  <!-- top navigation bar -->
+  <div class="navigation" ng-controller="navController" ng-include="template.url">
+  <!-- <div class="navigation" ng-include="partials/navigation.html"> -->
   </div>
 
-  <div id="container">
-    <button id="logoutButton">Logout</button>
-    <div>
-      <label for="filter">Filter
-        <input name="filter" id="filter">
-      </label>
-      <button id="filterButton">Submit</button>
-    </div>
-    <div ng-controller="listController">
-      <ul>
-        <li class="link" ng-repeat="link in links">
-          <img src="/redirect_icon.png"/>
-          <div class="info">
-            <div class="visits">
-              Last Visited:<span class="lastVisited">{{ link.updated_at }}</span>
-              <span class="count">{{ link.visits }} </span>Visits
-            </div>
-            <div class="title">{{ link.title }}
-            </div>
-            <div class="original">{{ link.url }}
-            </div>
-            <a href="{{link.base_url}}/{{link.code}}">{{ link.base_url }}/{{ link.code }}</a>
-          </div>
-        </li>
-      </ul>
-    </div>
+  <!-- placeholder for views -->
+  <div id="container" ng-view="">
   </div>
 
+  <!-- setup the application module -->
   <script>
-  var shortlyClient = angular.module('shortlyClient', []);
+  var shortlyClient = angular.module('shortlyClient', ['ngRoute']);
   </script>
 
+  <!-- Setup router -->
   <script>
-    shortlyClient.controller('listController', function($scope) {
-      $scope.links =
-      [
-        {
-          updated_at: 'Fri Feb 7, 2014 - 9:32PM',
-          visits: 5,
-          url: "http://www.cnn.com",
-          base_url: "http://localhost:3002",
-          code: "81b47",
-          title: "CNN.com - Breaking News, U.S., World, Weather, Entertainment & Video News",
-        },
-        {
-          updated_at: 'Fri Feb 7, 2014 - 9:32PM',
-          visits: 5,
-          url: "http://www.cnn.com",
-          base_url: "http://localhost:3002",
-          code: "81b47",
-          title: "CNN.com - Breaking News, U.S., World, Weather, Entertainment & Video News",
-        },
-      ]
-    });
+  shortlyClient.config( function($routeProvider, $locationProvider) {
+    $locationProvider.html5Mode(true);
+    $routeProvider
+      .when('/', {
+        controller: 'listController',
+        templateUrl: 'partials/links.html'
+      })
+      .when('/create', {
+        controller: 'createViewController',
+        templateUrl: 'partials/createView.html'
+      })
+      .when('/:short', {
+        controller: 'shortUrlController',
+        templateUrl: 'partials/links.html'
+      })
+      .otherwise( {
+        redirectTo: '/'
+      });
+  });
+  </script>
+
+  <!-- Setup Controllers -->
+      <!-- Navigation View Controller -->
+  <script>
+  shortlyClient.controller('navController', function($scope) {
+    $scope.template = { name: 'navigation.html', url: 'partials/navigation.html'}
+  });
+
+  shortlyClient.controller('shortUrlController', function($scope, $routeParams, $window) {
+    $window.location.href = $routeParams.short;
+  })
+  </script>
+
+      <!-- Create View Controller -->
+  <script>
+  shortlyClient.controller('createViewController', function($scope) {
+  });
+  </script>
+
+      <!-- List View Controller -->
+  <script>
+  shortlyClient.controller('listController', function($scope, dataApi) {
+     $scope.order = 'visits';
+     $scope.reverse = true;
+     dataApi.get().then( function(data) {
+        $scope.links = data.data;
+
+     });
+  });
+  </script>
+
+  <!-- Setup Services -->
+      <!-- HTTP service -->
+  <script>
+  shortlyClient.factory('dataApi', function($http, $q) {
+    var links = [];
+    var deferred;
+    return {
+      get: function() {
+        deferred = deferred || this.getLinks();
+        return deferred;
+      },
+      getLinks: function() {
+        deferred = $http.get('/links');
+        deferred
+        .success( function(data) {
+                  data.data.links.forEach( function(link) {
+           var d = new Date( link.updated_at );
+           link.updated_at = d.toLocaleDateString() + '-' + d.toLocalTimeString();
+        });
+              links = data;
+        })
+        .catch( function(error) {
+          console.log('dataApi.getLinks return error ', error);
+        });
+        return deferred; 
+      },
+      postLinks: function() {
+          // POST messages
+      }
+    }
+  });
   </script>
 
 </body>

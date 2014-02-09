@@ -6,14 +6,10 @@ require 'pry'
 require 'uri'
 require 'open-uri'
 require 'digest/sha1'
-# require 'nokogiri'
 
 ###########################################################
 # Configuration
 ###########################################################
-
-set :public_folder, File.dirname(__FILE__) + '/public'
-
 configure :development, :production do
     ActiveRecord::Base.establish_connection(
        :adapter => 'sqlite3',
@@ -44,7 +40,6 @@ register do
         id = user.id unless !user
       end
       redirect "/login" unless session[:user_id] && session[:user_id] == id
-      ##redirect "/login" unless session[:user_id] && session[:user_id] == User.find(session[:user_id]).id
     end
   end
 end
@@ -109,10 +104,6 @@ end
 post '/login' do
   # bypass server side loging
   user = User.find_by_username(params[:username])
-  # if !user || user.password_hash != Digest::SHA1.hexdigest(params[:password]+user.password_salt)[0,63]
-  #   session[:user_id] = nil
-  #   redirect to '/login'
-  # else
     session[:user_id] = user.id
     redirect to '/'
   # end
@@ -137,8 +128,6 @@ post '/links', :auth => :user do
     raise Sinatra::NotFound unless uri.absolute?
     link = @loggedInUser.links.find_by_url(uri.to_s) ||
            @loggedInUser.links.create(url: uri.to_s, title: get_url_title(uri) )
-           #Link.find_by_url(uri.to_s) ||
-           #Link.create( url: uri.to_s, title: get_url_title(uri), user_id: @loggedInUser.id )
     link.as_json.merge(base_url: request.base_url).to_json
 end
 
@@ -168,7 +157,6 @@ def read_url_head url
 end
 
 def get_url_title url
-    # Nokogiri::HTML.parse( read_url_head url ).title
     result = read_url_head(url).match(/<title>(.*)<\/title>/)
     result.nil? ? "" : result[1]
 end
